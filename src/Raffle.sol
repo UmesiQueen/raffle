@@ -33,7 +33,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
     /**
      * Errors
      */
-    error Raffle__SendMoreETHToEnterRaffle();
+    error Raffle__InsufficientEntranceFee();
     error Raffle__FailedToSendETHToWinner();
     error Raffle__RaffleNotOpen();
     error Raffle__UpkeepNotNeeded(uint256 balance, uint256 playersLength, RaffleState raffleState);
@@ -88,9 +88,9 @@ contract Raffle is VRFConsumerBaseV2Plus {
 
     function enterRaffle() external payable {
         // require(msg.value >= i_entranceFee, "Not Enough ETH sent!");
-        // require(msg.value >= i_entranceFee, Raffle__SendMoreETHToEnterRaffle());
+        // require(msg.value >= i_entranceFee, Raffle__InsufficientEntranceFee());
         if (msg.value < i_entranceFee) {
-            revert Raffle__SendMoreETHToEnterRaffle();
+            revert Raffle__InsufficientEntranceFee();
         }
         if (s_raffleState != RaffleState.OPEN) {
             revert Raffle__RaffleNotOpen();
@@ -179,5 +179,13 @@ contract Raffle is VRFConsumerBaseV2Plus {
      */
     function getEntranceFee() external view returns (uint256) {
         return i_entranceFee;
+    }
+
+    function getRaffleState() external view returns (RaffleState) {
+        return s_raffleState;
+    }
+
+    function getPlayer(uint256 indexOfPlayer) external view returns (address) {
+        return s_players[indexOfPlayer];
     }
 }
