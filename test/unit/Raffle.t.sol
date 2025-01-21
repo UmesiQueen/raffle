@@ -37,7 +37,7 @@ contract RaffleTest is Test {
     }
 
     /**
-     * functions
+     * Functions
      */
     function setUp() external {
         DeployRaffle deploy = new DeployRaffle();
@@ -79,6 +79,23 @@ contract RaffleTest is Test {
         vm.expectEmit(true, false, false, false, address(raffle));
         emit RaffleEntered(PLAYER);
         // Assert
+        raffle.enterRaffle{value: entranceFee}();
+    }
+
+    function testRestrictPlayersFromEnteringWhileRaffleIsCalculating()
+        public
+        prankPlayer
+    {
+        raffle.enterRaffle{value: entranceFee}();
+        // Set the block.timestamp
+        vm.warp(block.timestamp + interval + 1);
+        //  Set block.number
+        vm.roll(block.number + 1);
+        raffle.performUpkeep("");
+
+        // Act
+        vm.expectRevert(Raffle.Raffle__RaffleNotOpen.selector);
+        vm.prank(PLAYER);
         raffle.enterRaffle{value: entranceFee}();
     }
 }
