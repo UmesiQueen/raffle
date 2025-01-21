@@ -28,15 +28,6 @@ contract RaffleTest is Test {
     event WinnerPicked(address indexed winner);
 
     /**
-     * modifier
-     */
-    modifier prankPlayer() {
-        // Arrange
-        vm.prank(PLAYER);
-        _;
-    }
-
-    /**
      * Functions
      */
     function setUp() external {
@@ -60,13 +51,17 @@ contract RaffleTest is Test {
     /**
      * Enter Raffle
      */
-    function testRaffleRevertWithInsufficientEntranceFee() public prankPlayer {
+    function testRaffleRevertWithInsufficientEntranceFee() public {
+        // Arrange
+        vm.prank(PLAYER);
         // Act / Assert
         vm.expectRevert(Raffle.Raffle__InsufficientEntranceFee.selector);
         raffle.enterRaffle();
     }
 
-    function testRaffleRecordsPlayersOnEntry() public prankPlayer {
+    function testRaffleRecordsPlayersOnEntry() public {
+        // Arrange
+        vm.prank(PLAYER);
         // Act
         raffle.enterRaffle{value: entranceFee}();
         // Assert
@@ -74,7 +69,9 @@ contract RaffleTest is Test {
         assertEq(PLAYER, playerRecord);
     }
 
-    function testEnteringRaffleEmitsEvent() public prankPlayer {
+    function testEnteringRaffleEmitsEvent() public {
+        // Arrange
+        vm.prank(PLAYER);
         // Act
         vm.expectEmit(true, false, false, false, address(raffle));
         emit RaffleEntered(PLAYER);
@@ -82,10 +79,9 @@ contract RaffleTest is Test {
         raffle.enterRaffle{value: entranceFee}();
     }
 
-    function testRestrictPlayersFromEnteringWhileRaffleIsCalculating()
-        public
-        prankPlayer
-    {
+    function testRestrictPlayersFromEnteringWhileRaffleIsCalculating() public {
+        // Arrange
+        vm.prank(PLAYER);
         raffle.enterRaffle{value: entranceFee}();
         // Set the block.timestamp
         vm.warp(block.timestamp + interval + 1);
